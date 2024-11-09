@@ -19,6 +19,7 @@ const Product = () => (
           <p>MRP: $395.97</p>
           <p className="font-semibold">Offer price: $374.43</p>
           <p className="font-semibold text-green-600">6% off</p>
+          <p>first commit</p>
         </div>
       </div>
     </div>
