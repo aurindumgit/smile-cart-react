@@ -1,23 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import Carousel from './Carousel'; // Import the Carousel component
-import axios from "axios";
-import { append, isNotNil } from 'ramda'; // Import append and isNotNil from ramda
+import Carousel from './Carousel';
+import { append, isNotNil } from 'ramda';
 import './spinner.css';
+import productsApi from "../apis/products";
+
 
 const Product = () => {
-  const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [isLoading, setIsLoading] = useState(true);
   const [product, setProduct] = useState({});
 
   const fetchProduct = async () => {
     try {
-      const response = await axios.get(
-        "https://smile-cart-backend-staging.neetodeployapp.com/products/infinix-inbook-2"
-      );
-      setProduct(response.data);
+      const product = await productsApi.show();
+      setProduct(product);
     } catch (error) {
-      console.log("An error occurred:", error);
+      console.error("Failed to fetch product:", error);
     } finally {
-      setIsLoading(false); // Set isLoading to false after the fetch is complete
+      setIsLoading(false);
     }
   };
 
@@ -25,15 +24,14 @@ const Product = () => {
     fetchProduct();
   }, []);
 
-  // Destructuring product data and renaming keys to camelCase
-  const { name, description, mrp, offer_price: offerPrice, image_urls: imageUrls, image_url: imageUrl } = product;
+  // Destructuring product data
+  const { name, description, mrp, offerPrice, imageUrls, imageUrl } = product;
   const totalDiscounts = mrp - offerPrice;
   const discountPercentage = ((totalDiscounts / mrp) * 100).toFixed(1);
 
   // If the image_urls exists, append it with the default image_url
   const combinedImageUrls = isNotNil(imageUrls) ? append(imageUrl, imageUrls) : [imageUrl];
 
-  // Loader state rendering (custom loader)
   if (isLoading) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
@@ -55,7 +53,7 @@ const Product = () => {
         <div className="w-2/5">
           <div className="flex justify-center gap-16">
             {/* Conditionally render the Carousel if imageUrls exist */}
-            {isNotNil(imageUrls) ? (
+            {Array.isArray(imageUrls) && imageUrls.length > 0 ? (
               <Carousel imageUrls={combinedImageUrls} title={name} />
             ) : (
               <img alt={name} className="w-48" src={imageUrl} />
