@@ -1,8 +1,10 @@
 import axios from "axios";
 
-const show = () =>
-  axios.get("https://smile-cart-backend-staging.neetodeployapp.com/products/infinix-inbook-2");
+const show = slug => axios.get(`https://smile-cart-backend-staging.neetodeployapp.com/products/${slug}`);
 
-const productsApi = { show };
+const fetch = () => axios.get("https://smile-cart-backend-staging.neetodeployapp.com/products/");
+
+const productsApi = { show, fetch };
+
 
 export default productsApi;

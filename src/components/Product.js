@@ -1,18 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import Carousel from './Carousel';
-import { append, isNotNil } from 'ramda';
-import './spinner.css';
+import React, { useState, useEffect } from "react";
 import productsApi from "../apis/products";
-
+import Carousel from "./Carousel";
+import { append, isNotNil } from "ramda";
+import "./spinner.css";
+import { useParams, useHistory } from "react-router-dom";
 
 const Product = () => {
+  const history = useHistory();
+  // const [isError, setIsError] = useState(false);
+  const { slug } = useParams();
   const [isLoading, setIsLoading] = useState(true);
   const [product, setProduct] = useState({});
-
+  
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchProduct = async () => {
     try {
-      const product = await productsApi.show();
-      setProduct(product);
+      const response = await productsApi.show(slug);
+      setProduct(response);
     } catch (error) {
       console.error("Failed to fetch product:", error);
     } finally {
@@ -22,14 +26,11 @@ const Product = () => {
 
   useEffect(() => {
     fetchProduct();
-  }, []);
+  }, [fetchProduct, slug]);
 
-  // Destructuring product data
   const { name, description, mrp, offerPrice, imageUrls, imageUrl } = product;
   const totalDiscounts = mrp - offerPrice;
   const discountPercentage = ((totalDiscounts / mrp) * 100).toFixed(1);
-
-  // If the image_urls exists, append it with the default image_url
   const combinedImageUrls = isNotNil(imageUrls) ? append(imageUrl, imageUrls) : [imageUrl];
 
   if (isLoading) {
@@ -42,17 +43,20 @@ const Product = () => {
 
   return (
     <div className="px-6 pb-6">
-      {/* Product title and separator */}
-      <div>
+      <div className="flex items-center gap-10">
+        <button
+          className="neeto-ui-bg-gray-200 neeto-ui-text-black neeto-ui-rounded-full px-4 py-2 hover:neeto-ui-bg-gray-400"
+          onClick={history.goBack}
+        >
+          Go Back
+        </button>
         <p className="py-2 text-4xl font-semibold">{name}</p>
-        <hr className="border-2 border-black" />
       </div>
+      <hr className="border-2 border-black" />
 
-      {/* Product details and carousel */}
       <div className="flex gap-4 mt-6">
         <div className="w-2/5">
-          <div className="flex justify-center gap-16">
-            {/* Conditionally render the Carousel if imageUrls exist */}
+          <div className="flex justify-center gap-6">
             {Array.isArray(imageUrls) && imageUrls.length > 0 ? (
               <Carousel imageUrls={combinedImageUrls} title={name} />
             ) : (
@@ -60,7 +64,6 @@ const Product = () => {
             )}
           </div>
         </div>
-
         <div className="w-3/5 space-y-4">
           <p>{description}</p>
           <p>MRP: {mrp}</p>
