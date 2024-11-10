@@ -1,13 +1,25 @@
-import React from "react";
-import Product from "./components/Product"; // Import the Product component
+import { Route, Switch, NavLink } from "react-router-dom";
+import Home from "./components/Home";
+import Product from "./components/Product";
+import PageNotFound from "./components/PageNotFound";
 
-const App = () => {
-  return (
-    <div className="App">
-      <h1 className="text-center text-3xl font-bold mb-4">Smile Cart</h1>
-      <Product /> {/* Render the Product component */}
+const App = () => (
+  <>
+    <div className="mx-4 flex space-x-2">
+      <NavLink exact activeClassName="underline font-bold" to="/">
+        Home
+      </NavLink>
+      <NavLink exact activeClassName="underline font-bold" to="/product">
+        Product
+      </NavLink>
     </div>
-  );
-};
+    <Switch>
+      <Route exact component={Product} path="/product" />
+      <Route exact component={Home} path="/" />
+      <Route component={PageNotFound} path="*" />
+    </Switch>
+   
+  </>
+);
 
 export default App;
